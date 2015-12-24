@@ -1,8 +1,13 @@
 #pragma once
 
 #include <stdint.h>
+#include <stdlib.h>
 #define BLOCK_WIDTH 16
 #define BLOCK_HEIGHT 18
+#define BLOCK_OFFSET_TOP 10
+#define BLOCK_OFFSET_LEFT 0
+#define BLOCK_LANE 3
+#define BLOCK_RAND 3
 
 typedef enum {
     FSM_IDLE,
@@ -16,19 +21,15 @@ typedef struct {
     uint16_t score;
     uint8_t ncount;
     uint8_t rndcount;
-    struct {
-        uint8_t top : 1;
-        uint8_t mid : 1;
-        uint8_t bot : 1;
-    } carpos;
-    uint8_t obstaclepos[3];
+    uint8_t carpos;
+    uint8_t obstaclepos[BLOCK_LANE];
 } fsm_output_t;
 
 typedef struct {
     struct {
-        uint8_t top : 1;
-        uint8_t bot : 1;
+        uint8_t up : 1;
+        uint8_t down : 1;
     } button;
 } fsm_input_t;
 
-void fsm(fsm_output_t *o, fsm_input_t *i);
+void fsm(fsm_output_t *o, fsm_input_t *i, fsm_state_t *s);
