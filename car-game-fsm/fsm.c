@@ -1,5 +1,9 @@
 #include "fsm.h"
 
+void input(fsm_input_t *i) {
+    // Input function here
+}
+
 void fsm(fsm_output_t *o, fsm_input_t *i, fsm_state_t *s) {
     int n;
     uint8_t newlane, isPass;
@@ -47,16 +51,14 @@ void fsm(fsm_output_t *o, fsm_input_t *i, fsm_state_t *s) {
             // Generate new car
             if (o->rndcount++ >= BLOCK_RAND) {
                 if (rand() & 4) {
-                    do {
-                        newlane = rand();
-                        // Do not continue when all car is blocking the lane
-                    } while (newline & (1<<BLOCK_LANE-1) == (1<<BLOCK_LANE-1));
-
+                    // Get new lane configuration
+                    newlane = (newlane % BLOCK_LANE_BIT) + 1;
+                    // Reset the random counter
                     o->rndcount = 0;
-
+                    // Create new obstacle on the screen
                     for (n = 0; n < BLOCK_LANE; n++) {
-                        o->obstaclepos[n] = (newline & 0x1) << 7;
-                        newline = newline >> 1;
+                        o->obstaclepos[n] |= (newlane & 0x1) << 7;
+                        newlane = newlane >> 1;
                     }
                 }
             }
@@ -76,7 +78,9 @@ void fsm(fsm_output_t *o, fsm_input_t *i, fsm_state_t *s) {
     } else {
         *s = FSM_IDLE;
     }
+}
 
+void output(fsm_output_t *o, fsm_input_t *i, fsm_state_t *s) {
     // Output state
     if (*s = FSM_IDLE) {
         if (o->state != FSM_IDLE) {
@@ -103,4 +107,7 @@ void fsm(fsm_output_t *o, fsm_input_t *i, fsm_state_t *s) {
             o->state = FSM_GAME_OVER;
         }
     }
+
+    // Copy the input state to the last input
+    o->lastInput = *i;
 }
